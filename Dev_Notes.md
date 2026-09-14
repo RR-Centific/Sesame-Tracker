@@ -19,8 +19,7 @@ Project Sesame (local folder may still be named Project Wave Checklist App Test)
 ├── Changelog.md                       [Version history and why]
 ├── Team_Handoff.md                    [For humans maintaining the project]
 │
-├── demo.html                          [Working copy of the single-file app during the client demo]
-├── index.html                         [Mirrored copy of demo.html — GitHub Pages homepage]
+├── index.html                         [Single-file app — local testing and GitHub Pages homepage]
 ├── Session Checklist.xlsx             [Protocol source for Session Checklist copy]
 │
 └── Reference Files/
@@ -50,24 +49,25 @@ Project Sesame (local folder may still be named Project Wave Checklist App Test)
 ## Current state
 
 ### Version
-**0.2.091426** (`APP_VERSION` in `demo.html` / `index.html`). See `Changelog.md`.
+**0.3.091426** (`APP_VERSION` in `index.html`). See `Changelog.md`.
 
 ### Shipped (local-only skeleton)
-- [x] Frontend skeleton in `demo.html` / `index.html` (Kilo tokens, login, app shell, menu, theme toggle, mobile layout)
+- [x] Frontend skeleton in `index.html` (Kilo tokens, login, app shell, menu, theme toggle, mobile layout)
 - [x] Sidebar: **Your Assigned Sessions**, date/time, type chip, participant short name, phase dots; completed sessions show a full-width pink **completed** pill. Desktop collapse-to-rail control (remembered).
 - [x] Session detail: three phases — **Device Prep**, **Session Checklist**, **Post-Session**. Notes + Complete session always visible on Post-Session; Notes are required (helper: “Please describe how the session went and note anything out of the ordinary”); button disabled until `sessionComplete()` and notes are non-empty.
-- [x] Nested Session Checklist: protocol from `Session Checklist.xlsx`; title-only items on the main list (greet/IDs, NDA, **Claim new Task in Feather**, participant orientation, Hydra intake); sequentially unlocked T1 → A1 → A2 → M1 with protocol labels (Walking and tracking / Walking with Pose Transitions / Static presence and actions / Mixed actions and gestures); six detailed checks under **Before Recording** / **After Recording** (headers + helper notes, not steps); desktop two-pane view and mobile drill-in
+- [x] Runbook-aligned Session Checklist from `Hydra-mmWave-Centific-Collection-Runbook-8_27.pdf`: required Hydra Intake metadata; C0 once per session; 1–6 generated T1 room groups; sequential locking; capture metadata and final package SHA-256; desktop two-pane view and mobile drill-in
 - [x] Login against placeholder Moderators. Client demo: `moderator` / `admin` (amber **Demo Version Logins** banner). No username prefill. Legacy: `riley.robertson`, `david.kang`, `wave.admin`
 - [x] Moderators only load/see sessions assigned to them (`sessionAssignedTo`). `moderator` sees every placeholder session (Redmond + Las Vegas), one per day Aug 23–29; the two sessions scheduled before Aug 25 are pre-completed, the rest are incomplete
-- [x] localStorage per username (`wave_session_v26_<username>`)
+- [x] localStorage per username (`sesame_session_v30_<username>`; bumped for the runbook/data-model change)
 - [x] Cloud sync **stubs**: `MODERATORS_READ_URL`, `SESSIONS_READ_URL`, `SESSIONS_WRITE_URL`, `SESSIONLOG_WRITE_URL` are `''`; reads fall back to placeholders; writes log to console
 - [x] Menu: placeholder page links (Checklist / Project Updates / Guidelines / Troubleshooting) with the current page marked by `.current` + `aria-current="page"` (hardcoded to Checklist until the other pages exist; chevron hidden on the current item), then Sign out, **Reset app (demo only)** with an amber outline (keeps the user signed in and restores placeholder checklists), then placeholder reminders and a **Latest Update** card (currently New SSDs, Aug 24, 2026). Username is in the top header (left of theme toggle, user icon to the right of the name).
+- [x] Single-file layout: `index.html` only (GitHub Pages homepage; `demo.html` removed)
 - [ ] Theme toggle is in the nav (works); not a separate “settings” panel
 - [ ] Reference media: steps may have `ref_media_id`; UI shows “not yet configured”
 - [ ] Menu reminders are still placeholder copy
 
 ### In Progress
-- Client demo is live on GitHub Pages. Iterate UI against that URL. Backend not started.
+- Production repo is live on GitHub Pages. Iterate UI against that URL. Backend not started.
 
 ### Not yet started
 - Real reminders & troubleshooting
@@ -76,10 +76,9 @@ Project Sesame (local folder may still be named Project Wave Checklist App Test)
 - Power Automate flows (URLs still empty)
 - SharePoint Lists
 - Clearing leftover demo logins / placeholder roster before real users
-- Drop `demo.html` and work only on `index.html` after the demo is locked
 
 ### How to run locally
-Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Centific.github.io/Sesame-Tracker/. Amber banner: `moderator` (checklist) and `admin` (dashboard). If the list looks stale, sign out or use a private window — storage key is currently `wave_session_v26_`. Until the demo is finalized, edit `demo.html` and copy it to `index.html` so they stay identical.
+Open `index.html` in a browser, or the live site at https://RR-Centific.github.io/Sesame-Tracker/. Amber banner: `moderator` (checklist) and `admin` (dashboard). If the list looks stale, sign out or use a private window — storage key is currently `sesame_session_v30_`. Edit `index.html` only.
 
 ---
 
@@ -101,7 +100,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
   - [ ] Read flows for each table (return all rows as JSON)
   - [ ] Write flow for SessionLog (append only, no updates)
   - [ ] Write flow for Sessions (update status, useable_minutes)
-  - [ ] Get flow URLs, wire into `demo.html` / `index.html` constants
+  - [ ] Get flow URLs, wire into `index.html` constants
 
 **Frontend skeleton:**
 - [x] Create `app.html` from Kilo patterns:
@@ -115,7 +114,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
 #### Week 2: Content + admin basics
 
 **Workflow definition:**
-- [x] Device Prep checklist (6 steps + condition notes) — landed in `demo.html` / `index.html`
+- [x] Device Prep checklist — landed in `index.html`
 - [x] Session Checklist (greet → NDA/consent → explain/rehearse → Hydra M1 / A1 / A2 / T1); greet/explain wording still differs by session type
 - [x] Post-Session checklist (Hydra ingestion while on X5 Wi-Fi, finish Feather metadata and mark task Completed, TAR upload, pack/return)
 - [ ] Identify reference media needs (clips/GIFs moderators will need)
@@ -128,7 +127,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
 - [x] Build menu panel (reminders, troubleshooting table, settings)
 - [x] Add session completion form (notes required; Complete session gated on all steps + notes)
 - [ ] Test on iPhone + Android
-- [x] Version bump to 0.2.MMDDYY (`0.2.091426`; previous demo polish was `0.2.082426`)
+- [x] Version bump to `0.3.091426` for the runbook workflow and metadata data-model change
 
 **Admin dashboard (basic):**
 - [x] Create admin login view (`admin` / `wave.admin`, `role: admin`)
@@ -189,7 +188,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
 **Decision**: Build as one `.html` file with inline CSS and JavaScript. No framework, no build pipeline.
 
 **Why**: 
-- Deployment is trivial (keep `index.html` mirrored, push to GitHub Pages)
+- Deployment is trivial (edit `index.html`, push to GitHub Pages)
 - No dependencies, no build step
 - Fast loading on mobile devices in field
 - Proven by Kilo for moderator apps
@@ -250,7 +249,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
   }]
 }
 ```
-Flat phases (Device Prep and Post-Session) still use their existing simple step objects. SessionLog events (when wired): `step_completed` / `step_reopened` / `session_completed`; nested child events also include `parent_key`, `parent`, and `step_key`.
+Flat phases (Device Prep and Post-Session) still use simple step objects. SessionLog events (when wired): `step_completed`, `step_reopened`, `metadata_updated`, and `session_completed`; nested child events also include `parent_key`, `parent`, and `step_key`. The completion payload includes session-level and scenario-level metadata.
 
 ---
 
@@ -267,7 +266,7 @@ Flat phases (Device Prep and Post-Session) still use their existing simple step 
 
 **Phase header area**: The phase name is not repeated above the list — the segmented control is the only label. `.seg-control` carries `margin-bottom:43px`, which reproduces the old spacing (20px control margin + 11px label + 12px label margin); change it if the control or list padding changes. The selected segment uses `--seg-active`, a per-theme value deliberately darker than `--card-bg` so the selection reads at a glance.
 
-**Current Session Checklist structure**: Top-level title-only — greet/IDs, signed NDA, claim new Task in Feather, participant orientation, then Hydra intake after the Hydra note. Scenario groups T1, A1, A2, M1 unlock sequentially (titles include the protocol labels). Each has six detailed checks: three under **Before Recording** (orientation/placement/obstructions) and three under **After Recording** (video, audio, performance). Section headers are not steps. Helper notes under the headers (full-contrast body text): Before Recording — do the checks for every camera placement, then mark them finished when the whole recording is done; After Recording — use Hydra preview for the three checks and re-record if anything fails. The Hydra instruction on the main list uses the same pink header + white body style, titled **Hydra App**. Section titles match Hydra App exactly: 12.5px, weight 700, uppercase, pink. Keep the title in a `span` (`.child-section-title`), not a `strong` — a nested `strong` resolves `bolder` against the 700 parent and renders at 900, which is what made the scenario headers look heavier than Hydra. Empty right pane copy: “Select a Scenario” / “Subtasks will appear here.” Same copy for single and paired until we get type-specific wording. Do not change `key` fields casually—they will be written to SessionLog.
+**Current Session Checklist structure**: Required Intake metadata appears above the task browser: Feather Task ID, one/two people, age range(s), room count, and one actual room name per selected room. Changing room count dynamically rebuilds 1–6 T1 groups while preserving progress for unchanged room keys. Scenario order is C0 once, then `scenario_t1_room_1` through `scenario_t1_room_N`. Each group unlocks only after Intake metadata and all prior tasks/groups are complete. C0 requires accepted duration and review decision. Each T1 room requires retained-view count (maximum 15), total attempts (not less than retained views), duration (maximum 30 minutes), and an Accepted review decision. Post-Session requires the package SHA-256. Section headers are informational and do not count as steps. Do not change keys casually—they will be written to SessionLog.
 
 ---
 
@@ -299,7 +298,7 @@ Flat phases (Device Prep and Post-Session) still use their existing simple step 
 ---
 
 ### Project name is Project Sesame
-**Decision**: The product is **Project Sesame**. Production GitHub repo and Pages site are `Sesame-Tracker`. Nav, login brand, page title, and the menu version stamp say **Sesame** (e.g. `Sesame v0.2.091426`). The local workspace folder and the Aug 2026 demo repo (`Wave-Checklist-Beta`) still use the old Wave name. localStorage keys (`wave_session_v26_`, etc.) and the legacy demo login `wave.admin` are unchanged so existing demo state still loads.
+**Decision**: The product is **Project Sesame**. Production GitHub repo and Pages site are `Sesame-Tracker`. Nav, login brand, page title, and the menu version stamp say **Sesame** (currently `Sesame v0.3.091426`). The local workspace folder and the Aug 2026 demo repo (`Wave-Checklist-Beta`) still use the old Wave name. The legacy demo login `wave.admin` remains; session storage moved to `sesame_session_v30_` for the new runbook schema.
 
 **Why**: Name locked 14 Sep 2026. `mmWave` / Project Wave were temporary names during skeleton and client-demo work.
 
@@ -359,7 +358,7 @@ Participants are the ten names from Riley’s `fake_contacts2.csv`, shown as fir
 - **Diagnostic console logs**. `console.log('[App] ...')` at decision points so bug reports can be self-diagnosed.
 
 ### Manual edits
-If you make a direct edit to `demo.html` / `index.html` (not through Claude), **mention it next time** — Claude has no way to know about it otherwise. This prevents Claude from undoing your changes or conflicting with them. Until the demo is locked, copy `demo.html` to `index.html` after edits.
+If you make a direct edit to `index.html` (not through Claude), **mention it next time** — Claude has no way to know about it otherwise. This prevents Claude from undoing your changes or conflicting with them.
 
 ---
 

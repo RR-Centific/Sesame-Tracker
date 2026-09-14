@@ -9,7 +9,7 @@
 You're inheriting the **Project Sesame** moderator checklist (see `README.md` for what the product is). Production GitHub repo is `Sesame-Tracker`. On-screen brand in the app is **Sesame**.
 
 **Architecture**:
-- **Frontend**: Single-file Kilo-style UI. Until the demo is locked, keep **`demo.html` and `index.html` identical** (`index.html` is the GitHub Pages file). After that, work only on `index.html`.
+- **Frontend**: Single-file Kilo-style UI in **`index.html`** (this is also the GitHub Pages file). Edit `index.html` only.
 - **Backend (planned)**: SharePoint Lists + Power Automate. Flow URL constants in the HTML file are empty; the current build uses placeholder data.
 - **Moderators**: Sign in, see **only assigned sessions**, work through step checklists, mark complete. Client demo login: `moderator`.
 - **Admins**: Sign in as `admin` for a read-only demo dashboard (not live SharePoint).
@@ -27,16 +27,15 @@ You're inheriting the **Project Sesame** moderator checklist (see `README.md` fo
 2. Describe what you want to change (e.g., "Add a new checkbox to the checklist," "Change the accent color to #00F0FF")
 3. Claude will propose changes and explain them
 4. When Claude is done, ask Claude to show you the changes before deploying
-5. **Important**: Tell Claude about any manual edits you make to `demo.html` / `index.html` — Claude won't know about them otherwise
+5. **Important**: Tell Claude about any manual edits you make to `index.html` — Claude won't know about them otherwise
 
 #### If you're technical (direct editing)
 1. Read `Reference Files/ARCHITECTURE_REFERENCE.md` sections 1–4 first (essential background)
-2. Edit `demo.html` (keep `index.html` in sync by copying `demo.html` over it after the change)
+2. Edit `index.html`
 3. After any changes:
-   - Verify JS parses: extract `<script>` from `demo.html` and run `new Function(code)`
+   - Verify JS parses: extract `<script>` from `index.html` and run `new Function(code)`
    - Verify CSS braces are balanced: count `{` and `}` in `<style>` — must end at 0
    - Bump the version number: change `APP_VERSION = 'X.Y.MMDDYY'` to today's date
-   - Copy `demo.html` to `index.html` so Pages stays current
 4. Test locally in a browser before committing
 5. **Commit message**: Describe WHAT changed and WHY (not just "fix" or "update")
 6. Tell Riley about the change if he's not the one who made it (so he can update `Dev_Notes.md`)
@@ -47,19 +46,18 @@ You're inheriting the **Project Sesame** moderator checklist (see `README.md` fo
 
 ### How to deploy
 
-1. Verify the app works locally (open `demo.html` or `index.html` in a browser, test on iOS and Android if possible)
-2. Make sure `index.html` matches `demo.html` (copy `demo.html` over `index.html` if you edited the working copy)
-3. Commit both files to the `main` branch of `https://github.com/RR-Centific/Sesame-Tracker.git`
-4. GitHub Pages deploys from `main` / `/` (already enabled)
-5. Test the live version at `https://RR-Centific.github.io/Sesame-Tracker/`
+1. Verify the app works locally (open `index.html` in a browser, test on iOS and Android if possible)
+2. Commit `index.html` to the `main` branch of `https://github.com/RR-Centific/Sesame-Tracker.git`
+3. GitHub Pages deploys from `main` / `/` (already enabled)
+4. Test the live version at `https://RR-Centific.github.io/Sesame-Tracker/`
 
 #### Recurring maintenance tasks
 
 ##### Local testing (until SharePoint is live)
-- Open `demo.html` or `index.html` in a browser. Demo logins (amber **Demo Version Logins** banner): `moderator` (checklist — all seven placeholder sessions, one per day Aug 23–29; the two sessions before Aug 25 are already completed), `admin` (dashboard). Legacy stand-ins `riley.robertson` and `david.kang` still work. Each moderator should only see their own sessions. If the list looks stale, sign out or use a private window (`wave_session_v26_`).
+- Open `index.html` in a browser. Demo logins (amber **Demo Version Logins** banner): `moderator` (checklist — all seven placeholder sessions, one per day Aug 23–29; the two sessions before Aug 25 are already completed), `admin` (dashboard). Legacy stand-ins `riley.robertson` and `david.kang` still work. Each moderator should only see their own sessions. If the list looks stale, sign out or use a private window (`sesame_session_v30_`).
 
 ##### App content & workflow
-- **Update session steps**: If the data-collection protocol changes, update the session steps in the HTML file and keep `demo.html` / `index.html` mirrored. Test thoroughly before deploying.
+- **Update session steps**: If the data-collection protocol changes, update the session steps in `index.html`. Test thoroughly before deploying.
 - **Update reminders**: If safety guidelines or best practices change, update the "Key Reminders" section in the menu panel and redeploy. Menu order is: placeholder page links (Checklist / Project Updates / Guidelines / Troubleshooting), Sign out, demo-only Reset app, then reminders and Latest Update. Reset app keeps the user signed in and restores placeholder checklist progress. The four page links are proof-of-concept only and do not navigate yet. The signed-in username is in the header bar, not the menu.
 - **Update Latest Update**: Replace the current menu card (New SSDs, Aug 24, 2026) with the newest project update and redeploy.
 - **Reference media updates**: If clips/GIFs need to be updated or added, upload to SharePoint Document Library and update ReferenceMedia list with new URLs.
@@ -72,11 +70,11 @@ You're inheriting the **Project Sesame** moderator checklist (see `README.md` fo
 - **Power Automate flow monitoring**: Check PA admin dashboard monthly for quota usage. If hitting limits, may need to archive old sessions.
 
 #### Version control
-- **Git history**: Keep `demo.html` and `index.html` in Git. Easy to roll back if a change breaks something.
+- **Git history**: Keep `index.html` in Git. Easy to roll back if a change breaks something.
 - **Version number bumping**: Update `APP_VERSION` constant (format: `MAJOR.MINOR.MMDDYY`) with every code change.
 
 #### Users & access
-- **Login credentials**: Username only, no passwords. Production: Moderators SharePoint list + `active=true`. Current skeleton: `PLACEHOLDER_MODERATORS` in `demo.html` / `index.html`.
+- **Login credentials**: Username only, no passwords. Production: Moderators SharePoint list + `active=true`. Current skeleton: `PLACEHOLDER_MODERATORS` in `index.html`.
 - **Admin access**: Usernames `admin` and `wave.admin` (`role: admin` in `PLACEHOLDER_MODERATORS`). Dashboard is demo data. Production: add admins to the Moderators list with an admin role — not implemented against SharePoint yet.
 
 #### Monitoring
@@ -106,11 +104,11 @@ The SessionLog is append-only and immutable. Every step completion creates a new
 - Change the meaning of existing event types (e.g., "completed" must always mean the same thing)
 
 ### Power Automate flow URLs
-These URLs are hardcoded in `demo.html` / `index.html`. If a flow is regenerated, the URL changes and the app silently stops syncing.
+These URLs are hardcoded in `index.html`. If a flow is regenerated, the URL changes and the app silently stops syncing.
 
 **If a flow URL changes**:
 1. Get the new URL from Power Automate
-2. Find the matching constant in `demo.html` / `index.html` (e.g., `SESSIONLOG_PA_WRITE_URL`)
+2. Find the matching constant in `index.html` (e.g., `SESSIONLOG_PA_WRITE_URL`)
 3. Update it
 4. Bump version number
 5. Redeploy
@@ -130,26 +128,28 @@ The app expects exact column names and types in SharePoint Lists. If a column is
 4. Only then rename in SharePoint
 
 **Critical columns** (app depends on these):
-- Sessions: `id`, `moderator_id`, `session_type`, `status`, `steps` (JSON)
-- SessionLog: `session_id`, `event`, `timestamp`
+- Sessions: `id`, `moderator_id`, `session_type`, `status`, `steps` (JSON), `metadata` (JSON), `scenario_metadata` (JSON)
+- Session metadata: `feather_task_id`, `people_available`, `age_ranges`, `room_count`, `room_names`
+- Scenario metadata: C0 `duration_seconds` / `review_decision`; each T1 room `retained_views` / `total_attempts` / `duration_minutes` / `review_decision`
+- SessionLog: `session_id`, `event`, `timestamp`; `metadata_updated` events also include field/value and optional `parent_key`
 - Moderators: `username`
 
 ### Nested task keys and completion
 Session Checklist tasks use stable `key` fields. Nested completion events will include both `parent_key` and `step_key`; changing keys after production data exists will fragment reporting.
 
 Current keys:
-- Top-level: `greet_confirm_ids`, `confirm_signed_nda`, `claim_new_feather_task`, `participant_orientation`, `complete_hydra_intake`
-- Scenario groups: `scenario_t1`, `scenario_a1`, `scenario_a2`, `scenario_m1`
-- Scenario checks: `{code}_{camera_orientation|camera_placement|camera_obstructions|video_check|audio_check|performance_check}`
-- Section headers: `{code}_before_recording`, `{code}_after_recording` (plus `note` helper copy; not checkable)
+- Top-level: `claim_new_feather_task`, `confirm_people_and_consent`, `select_session_rooms`, `complete_hydra_intake`
+- Scenario groups: `scenario_c0`, then `scenario_t1_room_1` through `scenario_t1_room_6` as selected
+- C0 checks: `c0_safe_position`, `c0_devices_ready`, `c0_start_stable`, `c0_varied_motion`, `c0_translations`, `c0_end_episode`, `c0_review_complete`
+- T1 checks: `t1_room_{N}_{confirm|move_bundle|plan_views|visibility|devices|movement|episodes|finish|review_complete}`
 
 - Grouped scenario tasks are never toggled directly. They derive completion from all nested checks.
-- Scenario groups unlock in list order. T1 requires all earlier top-level tasks; A1, A2, and M1 each require the preceding scenario to be complete.
+- Scenario groups unlock in list order. C0 requires complete Intake metadata and prior tasks. Every T1 room requires accepted C0/the prior room, including required capture metadata.
 - `before_recording` and `after_recording` are visual section headers, not checkable steps and not part of progress totals.
 - Title-only items on the main list and detailed scenario checks are the manually completed records.
 - Desktop uses a two-pane layout for scenario groups; title-only items toggle in place. Empty pane copy is “Select a Scenario” / “Subtasks will appear here.” Mobile uses drill-in only for scenario groups. Test both whenever task markup or CSS changes.
 - Post-Session always shows Notes and Complete session; Notes are required. The button stays disabled until every checkable step in all three phases is done and notes are filled.
-- Desktop sidebar collapse is stored in `wave_sidebar_collapsed`.
+- Desktop sidebar collapse remains stored in `wave_sidebar_collapsed`; session data uses `sesame_session_v30_`.
 - Do not surface the words “parent” or “child” in the UI. Those names are internal only.
 
 ### CSS class names
@@ -188,7 +188,7 @@ Microsoft 365 has limits on Power Automate API calls. With 200+ sessions, could 
 SessionLog is the source of truth for QA. Every step is logged with timestamp. QA team can cross-reference SessionLog against recorded video to catch protocol violations. Don't lose this data.
 
 ### Code comments are spec
-Comments in `demo.html` / `index.html` explain *why* decisions were made, not just *what* they do. They're part of the specification. Read them before making changes.
+Comments in `index.html` explain *why* decisions were made, not just *what* they do. They're part of the specification. Read them before making changes.
 
 ### Testing checklist
 Before declaring any change done:
@@ -226,7 +226,7 @@ Before declaring any change done:
 - [ ] **Define reference media**: What clips/GIFs needed, where stored, upload to SharePoint
 - [ ] **Write reminders + troubleshooting**: For menu panel
 - [ ] **Populate ReferenceMedia table**: Link clips/GIFs to session steps
-- [x] **Customize `demo.html` / `index.html`**: Demo protocol copy is in the HTML (Device Prep, Session Checklist, Post-Session). Still open: reference media and real reminders.
+- [x] **Customize `index.html`**: Runbook protocol copy is in the HTML (Device Prep, Session Checklist, Post-Session). Still open: reference media and real reminders.
 - [x] **Build admin dashboard**: Progress view (hours collected, target, active sites/moderators) — demo stats until SharePoint is live
 - [ ] **Test on real iPhones + Android phones** in field (not just desktop)
 
@@ -272,7 +272,7 @@ Before declaring any change done:
   1. Open browser console (`F12`), look for network errors or JS errors
   2. Check Power Automate flow status in PA admin (is flow enabled? did it trigger?)
   3. Verify Sessions list has data in SharePoint
-- **Fix**: Debug PA flow, check flow URL in `demo.html` / `index.html`, test flow manually, bump version, redeploy.
+- **Fix**: Debug PA flow, check flow URL in `index.html`, test flow manually, bump version, redeploy.
 
 ### Steps aren't logging (data not appearing in SessionLog)
 - **This is critical**. If SessionLog isn't getting data, audit trail is broken and QA can't review.

@@ -309,6 +309,29 @@ nav{
   white-space:normal;overflow-wrap:anywhere;
 }
 .child-task-desc.done{color:var(--text3)}
+.metadata-card{
+  margin-bottom:18px;padding:16px 18px;border:.5px solid var(--border);
+  border-radius:var(--rl);background:var(--card-bg);
+}
+.metadata-card-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.metadata-card-hint{font-size:12.5px;line-height:1.5;color:var(--text2);margin-bottom:14px}
+.metadata-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.metadata-field{min-width:0}
+.metadata-field.full{grid-column:1/-1}
+.metadata-field label{
+  display:block;font-size:11px;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--text2);margin-bottom:6px;
+}
+.metadata-field input,.metadata-field select{
+  width:100%;padding:10px 12px;background:var(--input-bg);border:.5px solid var(--border-strong);
+  border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;
+}
+.metadata-field input:focus,.metadata-field select:focus{
+  outline:none;border-color:var(--pink);box-shadow:0 0 0 4px rgba(239,67,179,.10);
+}
+.metadata-required{color:var(--pink)}
+.metadata-status{font-size:11px;color:var(--text3);margin-top:12px}
+.metadata-status.complete{color:var(--green)}
 @media(min-width:761px){.parent-arrow{display:none}}
 
 .done-banner{background:var(--bg3);border:.5px solid var(--pink);border-radius:12px;padding:14px 16px;text-align:center;margin-top:18px}
@@ -473,6 +496,8 @@ nav{
   .task-browser.drilled .task-browser-track{transform:translateX(-50%)}
   .task-pane{width:50%;flex:0 0 50%;padding-right:0}
   .task-pane.child-level{padding-left:16px}
+  .metadata-grid{grid-template-columns:1fr}
+  .metadata-field.full{grid-column:auto}
   .child-back{display:flex}
   .parent-task.active{border-radius:0}
   .parent-empty{display:none}
@@ -609,7 +634,7 @@ nav{
    placeholder data so the UI is fully testable before any flow exists.
    ============================================================ */
 
-const APP_VERSION = '0.2.091426'; // MAJOR.MINOR.MMDDYY — bump date on every change
+const APP_VERSION = '0.3.091426'; // MAJOR.MINOR.MMDDYY — bump date on every change
 
 // === Power Automate flow URLs (SharePoint Lists) — dormant until wired ===
 const MODERATORS_READ_URL   = ''; // Get items — Moderators list, filter by username
@@ -633,72 +658,102 @@ const PLACEHOLDER_MODERATORS = [
   { moderator_id: 'wave.admin',      username: 'wave.admin',      name: 'Wave Admin',      site_assigned: 'All', active: 'true', role: 'admin' },
 ];
 
-function buildPhaseSteps() {
-  const hydraNote = 'For the following steps, use the Hydra app to record all required scenarios. Hydra will guide you through the session and give you opportunities to check each recording before accepting and proceeding to the next scenario.';
-  const scenarioChecks = [
-    { kind: 'section', key: 'before_recording', t: 'Before Recording', note: 'The following checks should be done for every camera placement throughout the scenario. Mark these tasks as finished once the entire recording is complete.' },
-    { key: 'camera_orientation', t: 'Camera Orientation', description: 'Flat radar side of rig facing the middle of the room (or the direction where the participant will be most)' },
-    { key: 'camera_placement', t: 'Camera Placement', description: 'The device is placed close to the edge of the surface and firmly secured.' },
-    { key: 'camera_obstructions', t: 'Camera Obstructions', description: "Nothing blocking the camera's view of the room and participant movement." },
-    { kind: 'section', key: 'after_recording', t: 'After Recording', note: 'After a scenario recording has been completed, use the video/audio preview in Hydra for the 3 following checks. Re-record the scenario if any of the requirements are not met.' },
-    { key: 'video_check', t: 'Video Check', description: 'Video not blurry, no cables in view, moderator not visible at any point' },
-    { key: 'audio_check', t: 'Audio Check', description: 'Recorded audio is clear, no static, etc.' },
-    { key: 'performance_check', t: 'Performance Check', description: 'Participant meets all scenario movement requirements' },
-  ];
-  const scenarioLabels = {
-    T1: 'Walking and tracking',
-    A1: 'Walking with Pose Transitions',
-    A2: 'Static presence and actions',
-    M1: 'Mixed actions and gestures',
+function scenarioField(key, label, type, options, extra = {}) {
+  return { key, label, type, options, required: true, ...extra };
+}
+
+function buildC0Scenario() {
+  return {
+    kind: 'parent', key: 'scenario_c0', t: 'C0 — IMU Calibration-Support Motion', metadata: {},
+    fields: [
+      scenarioField('duration_seconds', 'Accepted episode duration (seconds)', 'number', null, { min: 1, max: 120 }),
+      scenarioField('review_decision', 'Final review decision', 'select', ['Accepted', 'Redo required'], { acceptedValue: 'Accepted' }),
+    ],
+    children: [
+      { kind: 'section', key: 'c0_setup', t: 'Set Up', note: 'C0 is recorded once per session. Move the complete rigid sensor platform; do not shake, release, or free-drop it.' },
+      { kind: 'child-detailed', key: 'c0_safe_position', t: 'Place the platform safely', description: 'Use a safe neutral position with the rigid mounting unchanged and cables slack.' },
+      { kind: 'child-detailed', key: 'c0_devices_ready', t: 'Confirm Devices 3/3', description: 'All three device rows are paired; click Start Capture and wait for the chirp to finish.' },
+      { kind: 'section', key: 'c0_capture', t: 'Capture', note: 'Aim for one approximately 50–60 second episode. The motion family matters; an exact trajectory does not.' },
+      { kind: 'child-detailed', key: 'c0_start_stable', t: 'Start Episode with the platform stable', description: 'Begin only after the synchronization chirp is complete.' },
+      { kind: 'child-detailed', key: 'c0_varied_motion', t: 'Perform varied, smooth whole-platform motion', description: 'Use one or more looping or figure-eight-like motions with gentle rotation and tilt.' },
+      { kind: 'child-detailed', key: 'c0_translations', t: 'Cover varied translations', description: 'Include forward/backward, left/right, and up/down motion, roughly 20–40 cm when space permits.' },
+      { kind: 'child-detailed', key: 'c0_end_episode', t: 'Set down securely and end near 55 seconds', description: 'Click End Episode after the platform is stable.' },
+      { kind: 'section', key: 'c0_review', t: 'Review', note: 'Accept when all sensors recorded, mounting stayed rigid, and meaningful smooth motion was captured.' },
+      { kind: 'child-detailed', key: 'c0_review_complete', t: 'Finish Scenario and review the episode', description: 'Choose Accept or Redo Scenario in Hydra, then record the final accepted duration and decision below.' },
+    ],
   };
-  const scenarioParent = code => ({
-    kind: 'parent',
-    key: `scenario_${code.toLowerCase()}`,
-    t: `Scenario ${code} - ${scenarioLabels[code]}`,
-    children: scenarioChecks.map(item => ({
-      kind: item.kind || 'child-detailed',
-      key: `${code.toLowerCase()}_${item.key}`,
-      t: item.t,
-      description: item.description,
-      note: item.note,
-    })),
-  });
+}
+
+function buildT1Scenario(roomIndex, roomName = '') {
+  const roomNumber = roomIndex + 1;
+  return {
+    kind: 'parent', key: `scenario_t1_room_${roomNumber}`,
+    t: `T1 — Room ${roomNumber}${roomName ? `: ${roomName}` : ''}`, roomIndex, metadata: {},
+    fields: [
+      scenarioField('retained_views', 'Retained stable views', 'number', null, { min: 1, max: 15 }),
+      scenarioField('total_attempts', 'Total attempts recorded', 'number', null, { min: 1, max: 99 }),
+      scenarioField('duration_minutes', 'Room capture duration (minutes)', 'number', null, { min: 1, max: 30, step: '0.1' }),
+      scenarioField('review_decision', 'Final review decision', 'select', ['Accepted', 'Redo required'], { acceptedValue: 'Accepted' }),
+    ],
+    children: [
+      { kind: 'section', key: `t1_room_${roomNumber}_plan`, t: 'Confirm & Pre-plan', note: 'Complete this planning while all sensors are stopped. Do not change rooms during a capture.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_confirm`, t: 'Confirm the next unfinished room', description: 'Verify Hydra Runner displays the actual room selected during Intake.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_move_bundle`, t: 'Move the complete bundle safely', description: 'Move the MacBook, rigid rig, and cables together; disconnect Mac power and any wall-powered hub.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_plan_views`, t: 'Pre-plan useful landing locations', description: 'Identify roughly 6–8 useful places or orientations across different sides, distances, or diagonals.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_visibility`, t: 'Confirm FOV and camera visibility', description: "Point the radar's flat antenna face toward the useful forward view and keep every person/path visible to the X5." },
+      { kind: 'section', key: `t1_room_${roomNumber}_capture`, t: 'Natural Tracking Capture', note: 'Retain 10–15 useful stable-view episodes near 55 seconds each. Keep sensors running between episodes and move promptly between views.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_devices`, t: 'Confirm Devices 3/3 and start capture', description: 'Wait for sensor startup and the synchronization chirp before starting an episode.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_movement`, t: 'Guide natural movement', description: 'Vary near/far distance and natural actions. Respond to tracking warnings by moving people closer and toward the radar front.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_episodes`, t: 'Run the stable-view episode loop', description: 'End near 55 seconds, promptly carry the complete upright rig to the next planned view, set it down securely, and restart once stable.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_finish`, t: 'Finish after useful geometry is covered', description: 'Finish when useful coverage is complete; 15 views and 30 minutes are ceilings, not targets.' },
+      { kind: 'section', key: `t1_room_${roomNumber}_review`, t: 'Review Room Capture', note: 'Check Retain Attempt for every attempt. Excluded attempts remain in the record but do not consume a retained-view slot.' },
+      { kind: 'child-detailed', key: `t1_room_${roomNumber}_review_complete`, t: 'Review all attempts and decide', description: 'Accept the room or redo the entire room capture, then record the final metrics below.' },
+    ],
+  };
+}
+
+function buildPhaseSteps(roomCount = 1, roomNames = []) {
+  const count = Math.max(1, Math.min(6, Number(roomCount) || 1));
+  const hydraNote = 'Create one Hydra session with C0 recorded once, followed by one T1 natural-tracking capture in every room selected during Intake. Complete every selected room before Ingestion.';
   return [
     {
-      key: 'equipment_pickup',
-      title: 'Device Prep',
+      key: 'equipment_pickup', title: 'Device Prep',
       steps: [
-        { t: 'Inspect all devices for visible damage', noteField: 'Condition notes' },
-        { t: 'Inspect Insta360 lens for scratches or dust', warn: 'Do not proceed with a cracked or occluded lens' },
-        { t: 'Confirm memory card is empty and formatted' },
-        { t: 'Confirm battery charge is at least 80%' },
-        { t: 'Verify microphone gain is +24 dB' },
-        { t: 'Verify camera resolution/framerate: 360 mode, 8K and 30 FPS' },
+        { t: 'Use the assigned camera-radar kit; do not change the rigid sensor mounting', noteField: 'Condition or mounting notes' },
+        { t: 'Connect radar and ambiMIK with short USB cables', warn: 'Any hub used during capture must be bus-powered from the MacBook—not plugged into a wall.' },
+        { t: 'Power on the X5 and confirm free storage and battery capacity' },
+        { t: 'Set the X5 to the approved 360 video mode (not single-lens mode)' },
+        { t: 'Set X5 Auto Power Off to Never' },
+        { t: 'Join X5 Wi-Fi at 192.168.42.1' },
+        { t: 'Turn off Auto-Join for nearby office Wi-Fi during capture and ingestion' },
+        { t: 'Charge the Mac and X5 and prevent the Mac from sleeping' },
+        { t: 'Prepare MacBook Speakers for the synchronization chirp when site rules permit' },
+        { t: 'Confirm Mac storage is green and free space is at least the displayed required space' },
+        { t: 'Open Devices and confirm Devices 3/3 with all three rows paired', warn: 'Do not capture with fewer than 3/3, a non-paired device row, or blocked disk.' },
       ],
     },
     {
-      key: 'session',
-      title: 'Session Checklist',
+      key: 'session', title: 'Session Checklist',
       steps: [
-        { kind: 'child-title', key: 'greet_confirm_ids', t: 'Greet participants and confirm IDs' },
-        { kind: 'child-title', key: 'confirm_signed_nda', t: 'Confirm signed NDA form' },
         { kind: 'child-title', key: 'claim_new_feather_task', t: 'Claim new Task in Feather' },
-        { kind: 'child-title', key: 'participant_orientation', t: 'Participant orientation' },
+        { kind: 'child-title', key: 'confirm_people_and_consent', t: 'Confirm one or two available people, age range, and consent' },
+        { kind: 'child-title', key: 'select_session_rooms', t: 'Select every room that will actually be recorded in this session' },
         { kind: 'info', title: 'Hydra App', t: hydraNote },
-        { kind: 'child-title', key: 'complete_hydra_intake', t: 'Complete Hydra intake' },
-        scenarioParent('T1'),
-        scenarioParent('A1'),
-        scenarioParent('A2'),
-        scenarioParent('M1'),
+        { kind: 'child-title', key: 'complete_hydra_intake', t: 'Complete Hydra Intake and create the session' },
+        buildC0Scenario(),
+        ...Array.from({ length: count }, (_, index) => buildT1Scenario(index, roomNames[index] || '')),
       ],
     },
     {
-      key: 'post_session',
-      title: 'Post-Session',
+      key: 'post_session', title: 'Post-Session',
       steps: [
-        { t: 'Complete ingestion Hydra while still connected to X5 Wi-Fi' },
+        { t: 'Confirm every Intake-selected room is accepted before opening Ingestion' },
+        { t: 'While still on X5 Wi-Fi, confirm Ingestion shows Devices 1/1 and begin ingestion' },
+        { t: 'Wait for every X5 recording part to reach 100% and for validation and packaging to pass' },
+        { t: 'Verify local video, audio, radar files, evidence, validation, tar, SHA-256, and package receipts' },
+        { t: 'Record the displayed package SHA-256', noteField: 'SHA-256 value', noteRequired: true },
         { t: 'Finish metadata entry in Feather and mark task as Completed' },
-        { t: 'Upload TAR File' },
+        { t: 'After local verification, leave X5 Wi-Fi and upload the TAR file' },
         { t: 'Inspect, clean, and repack equipment' },
         { t: 'Return and sign in equipment' },
       ],
@@ -735,6 +790,13 @@ function sessionLabel(session) {
 }
 
 function makePlaceholderSession({ id, moderator_id, site_id, session_type, scheduled_date, scheduled_time, participants }) {
+  const metadata = {
+    feather_task_id: '',
+    people_available: String(Math.min(2, Math.max(1, participants.length))),
+    age_ranges: '',
+    room_count: '1',
+    room_names: [''],
+  };
   return {
     session_id: id,
     moderator_id,
@@ -747,7 +809,8 @@ function makePlaceholderSession({ id, moderator_id, site_id, session_type, sched
     scheduled_at: `${scheduled_date}T${to24h(scheduled_time)}`,
     status: 'in_progress',
     notes: '',
-    phases: buildPhaseSteps(session_type),
+    metadata,
+    phases: buildPhaseSteps(metadata.room_count, metadata.room_names),
   };
 }
 
@@ -782,9 +845,27 @@ function placeholderSessions(moderatorId) {
     makePlaceholderSession({ id: 'sess_d03', moderator_id: 'david.kang', site_id: 'Las Vegas', session_type: 'single', scheduled_date: '2026-08-29', scheduled_time: '3:30 PM',  participants: [c[9].name] }),
   ];
   const tickAll = session => {
+    session.metadata ||= {};
+    session.metadata.feather_task_id ||= `DEMO-${session.session_id}`;
+    session.metadata.people_available ||= String(Math.min(2, Math.max(1, session.participants?.length || 1)));
+    session.metadata.age_ranges ||= '25–34';
+    session.metadata.room_count ||= '1';
+    session.metadata.room_names = (session.metadata.room_names?.length ? session.metadata.room_names : ['Conference Room']);
     const walk = tasks => (tasks || []).forEach(task => {
       if (task.kind === 'info' || task.kind === 'section') return;
-      if (task.children) walk(task.children);
+      if (task.children) {
+        task.metadata ||= {};
+        if (task.key === 'scenario_c0') {
+          task.metadata.duration_seconds = '55';
+          task.metadata.review_decision = 'Accepted';
+        } else if (task.key.startsWith('scenario_t1_room_')) {
+          task.metadata.retained_views = '12';
+          task.metadata.total_attempts = '12';
+          task.metadata.duration_minutes = '15';
+          task.metadata.review_decision = 'Accepted';
+        }
+        walk(task.children);
+      }
       else task.done = true;
     });
     (session.phases || []).forEach(phase => walk(phase.steps));
@@ -801,7 +882,14 @@ function placeholderSessions(moderatorId) {
       moderator_id: 'moderator',
       status: 'in_progress',
       notes: '',
-      phases: buildPhaseSteps(),
+      metadata: {
+        feather_task_id: '',
+        people_available: String(Math.min(2, Math.max(1, session.participants.length))),
+        age_ranges: '',
+        room_count: '1',
+        room_names: [''],
+      },
+      phases: buildPhaseSteps(1, ['']),
     };
     return session.status === 'completed' ? tickAll(copy) : copy;
   });
@@ -857,7 +945,7 @@ function defaultState() {
 }
 let state = defaultState();
 
-function sessionKeyFor(username) { return `wave_session_v26_${username.toLowerCase()}`; }
+function sessionKeyFor(username) { return `sesame_session_v30_${username.toLowerCase()}`; }
 
 function saveState() {
   if (!state.username) return;
@@ -1147,12 +1235,42 @@ function taskLeaves(task) {
 function phaseLeaves(phase) {
   return (phase?.steps || []).flatMap(taskLeaves);
 }
+function metadataFieldValid(field, value) {
+  const raw = String(value ?? '').trim();
+  if (!field.required && !raw) return true;
+  if (!raw) return false;
+  if (field.acceptedValue && raw !== field.acceptedValue) return false;
+  if (field.type === 'number') {
+    const number = Number(raw);
+    if (!Number.isFinite(number)) return false;
+    if (field.min != null && number < field.min) return false;
+    if (field.max != null && number > field.max) return false;
+  }
+  return true;
+}
+function taskMetadataComplete(task) {
+  const fieldsValid = (task?.fields || []).every(field => metadataFieldValid(field, task?.metadata?.[field.key]));
+  if (!fieldsValid) return false;
+  if (task?.metadata?.retained_views && task?.metadata?.total_attempts) {
+    return Number(task.metadata.total_attempts) >= Number(task.metadata.retained_views);
+  }
+  return true;
+}
+function sessionMetadataComplete(session) {
+  const metadata = session?.metadata || {};
+  const count = Number(metadata.room_count);
+  return !!String(metadata.feather_task_id || '').trim()
+    && ['1', '2'].includes(String(metadata.people_available || ''))
+    && !!String(metadata.age_ranges || '').trim()
+    && Number.isInteger(count) && count >= 1 && count <= 6
+    && Array.from({ length: count }, (_, index) => String(metadata.room_names?.[index] || '').trim()).every(Boolean);
+}
 function taskComplete(task) {
   if (isParentTask(task)) {
     const children = taskLeaves(task);
-    return children.length > 0 && children.every(child => child.done);
+    return children.length > 0 && children.every(child => child.done) && taskMetadataComplete(task);
   }
-  return !!task?.done;
+  return !!task?.done && (!task.noteRequired || !!String(task.note || '').trim());
 }
 function priorTasksComplete(steps, index) {
   return steps.slice(0, index)
@@ -1161,11 +1279,13 @@ function priorTasksComplete(steps, index) {
 }
 function phaseComplete(phase) {
   const leaves = phaseLeaves(phase);
-  return leaves.length > 0 && leaves.every(task => task.done);
+  return leaves.length > 0
+    && leaves.every(taskComplete)
+    && (phase.steps || []).filter(isParentTask).every(taskComplete);
 }
-function sessionComplete(session) { return session.phases.every(phaseComplete); }
+function sessionComplete(session) { return sessionMetadataComplete(session) && session.phases.every(phaseComplete); }
 function totalSteps(session) { return session.phases.reduce((n, phase) => n + phaseLeaves(phase).length, 0); }
-function doneSteps(session) { return session.phases.reduce((n, phase) => n + phaseLeaves(phase).filter(task => task.done).length, 0); }
+function doneSteps(session) { return session.phases.reduce((n, phase) => n + phaseLeaves(phase).filter(taskComplete).length, 0); }
 
 function renderSidebar() {
   const el = document.getElementById('sidebarList');
@@ -1215,6 +1335,66 @@ function renderInfoTask(task) {
   return `<div class="list-section"><strong>${escapeHTML(task.title || 'Note')}</strong>${task.t ? `<div class="list-section-note">${escapeHTML(task.t)}</div>` : ''}</div>`;
 }
 
+function renderSessionMetadata(session) {
+  const metadata = session.metadata || {};
+  const roomCount = Math.max(1, Math.min(6, Number(metadata.room_count) || 1));
+  const option = value => `<option value="${value}"${String(metadata.room_count) === String(value) ? ' selected' : ''}>${value}</option>`;
+  return `
+    <div class="metadata-card">
+      <div class="metadata-card-title">Hydra Intake metadata</div>
+      <div class="metadata-card-hint">Required session data from the runbook. Room count controls how many T1 room checklists appear below.</div>
+      <div class="metadata-grid">
+        <div class="metadata-field full">
+          <label for="metaFeatherTask">Feather Task ID <span class="metadata-required">*</span></label>
+          <input id="metaFeatherTask" class="session-metadata-input" data-meta-key="feather_task_id" value="${escapeAttr(metadata.feather_task_id || '')}" placeholder="Assigned Feather Task ID">
+        </div>
+        <div class="metadata-field">
+          <label for="metaPeople">People available <span class="metadata-required">*</span></label>
+          <select id="metaPeople" class="session-metadata-input" data-meta-key="people_available">
+            <option value="1"${String(metadata.people_available) === '1' ? ' selected' : ''}>1 person</option>
+            <option value="2"${String(metadata.people_available) === '2' ? ' selected' : ''}>2 people</option>
+          </select>
+        </div>
+        <div class="metadata-field">
+          <label for="metaAgeRanges">Age range(s) <span class="metadata-required">*</span></label>
+          <input id="metaAgeRanges" class="session-metadata-input" data-meta-key="age_ranges" value="${escapeAttr(metadata.age_ranges || '')}" placeholder="e.g. 25–34 / 35–44">
+        </div>
+        <div class="metadata-field">
+          <label for="metaRoomCount">Rooms this session <span class="metadata-required">*</span></label>
+          <select id="metaRoomCount" class="session-metadata-input" data-meta-key="room_count">${[1,2,3,4,5,6].map(option).join('')}</select>
+        </div>
+        ${Array.from({ length: roomCount }, (_, index) => `
+          <div class="metadata-field">
+            <label for="metaRoom${index + 1}">Room ${index + 1} name <span class="metadata-required">*</span></label>
+            <input id="metaRoom${index + 1}" class="room-name-input" data-room-index="${index}" value="${escapeAttr(metadata.room_names?.[index] || '')}" placeholder="Actual room recorded">
+          </div>`).join('')}
+      </div>
+      <div class="metadata-status${sessionMetadataComplete(session) ? ' complete' : ''}">
+        ${sessionMetadataComplete(session) ? 'Intake metadata complete' : 'Complete all required fields before finishing the session'}
+      </div>
+    </div>`;
+}
+
+function renderScenarioMetadata(task) {
+  if (!(task?.fields || []).length) return '';
+  const complete = taskMetadataComplete(task);
+  return `
+    <div class="metadata-card" style="margin:0;border-width:.5px 0 0;border-radius:0">
+      <div class="metadata-card-title">Capture metadata</div>
+      <div class="metadata-card-hint">Record the final accepted capture values from Hydra.</div>
+      <div class="metadata-grid">
+        ${task.fields.map(field => {
+          const value = task.metadata?.[field.key] ?? '';
+          const input = field.type === 'select'
+            ? `<select class="scenario-metadata-input" data-parent-key="${escapeAttr(task.key)}" data-field-key="${escapeAttr(field.key)}"><option value="">Select…</option>${field.options.map(item => `<option value="${escapeAttr(item)}"${String(value) === item ? ' selected' : ''}>${escapeHTML(item)}</option>`).join('')}</select>`
+            : `<input class="scenario-metadata-input" data-parent-key="${escapeAttr(task.key)}" data-field-key="${escapeAttr(field.key)}" type="${escapeAttr(field.type)}" value="${escapeAttr(value)}"${field.min != null ? ` min="${field.min}"` : ''}${field.max != null ? ` max="${field.max}"` : ''}${field.step ? ` step="${field.step}"` : ''}>`;
+          return `<div class="metadata-field"><label>${escapeHTML(field.label)} <span class="metadata-required">*</span></label>${input}</div>`;
+        }).join('')}
+      </div>
+      <div class="metadata-status${complete ? ' complete' : ''}">${complete ? 'Capture metadata complete' : 'Required before this scenario is complete'}</div>
+    </div>`;
+}
+
 function renderFlatPhaseTasks(phase) {
   let number = 0;
   return `
@@ -1226,14 +1406,14 @@ function renderFlatPhaseTasks(phase) {
         number += 1;
         return `
           <li class="step-item" data-step-idx="${index}">
-            <div class="step-dot${task.done ? ' done' : ''}">
+            <div class="step-dot${taskComplete(task) ? ' done' : ''}">
               <span class="step-num">${number}</span>
               <div class="step-tick"><svg viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9.5 10.5,3"/></svg></div>
             </div>
             <div class="step-content">
-              <span class="step-text${task.done ? ' done-text' : ''}">${escapeHTML(task.t)}</span>${task.meta ? `<span class="step-meta">${escapeHTML(task.meta)}</span>` : ''}
+              <span class="step-text${taskComplete(task) ? ' done-text' : ''}">${escapeHTML(task.t)}</span>${task.meta ? `<span class="step-meta">${escapeHTML(task.meta)}</span>` : ''}
               ${task.warn ? `<div class="warn-box">${escapeHTML(task.warn)}</div>` : ''}
-              ${task.noteField ? `<label class="step-note-label">${escapeHTML(task.noteField)}</label><textarea class="step-note" data-step-idx="${index}" rows="3" placeholder="${escapeAttr(task.noteField)}">${escapeHTML(task.note || '')}</textarea>` : ''}
+              ${task.noteField ? `<label class="step-note-label">${escapeHTML(task.noteField)}${task.noteRequired ? ' *' : ''}</label><textarea class="step-note" data-step-idx="${index}" rows="3" placeholder="${escapeAttr(task.noteField)}">${escapeHTML(task.note || '')}</textarea>` : ''}
               ${task.ref_media_id ? `<div class="ref-media-box">Reference media not yet configured (${escapeHTML(task.ref_media_id)})</div>` : ''}
             </div>
           </li>`;
@@ -1243,8 +1423,9 @@ function renderFlatPhaseTasks(phase) {
 
 function renderNestedPhaseTasks(phase) {
   const steps = phase.steps || [];
+  const metadataReady = sessionMetadataComplete(state.sessions[state.currentSessionId]);
   const selectedIndex = steps.findIndex(task => isParentTask(task) && task.key === state.currentParentKey);
-  const selected = selectedIndex >= 0 && priorTasksComplete(steps, selectedIndex) ? steps[selectedIndex] : null;
+  const selected = selectedIndex >= 0 && metadataReady && priorTasksComplete(steps, selectedIndex) ? steps[selectedIndex] : null;
   const selectedChildren = selected?.children || [];
   const selectedLeaves = taskLeaves(selected);
   const selectedDone = selectedLeaves.filter(child => child.done).length;
@@ -1263,7 +1444,7 @@ function renderNestedPhaseTasks(phase) {
               if (isParentTask(task)) {
                 const children = taskLeaves(task);
                 const done = children.filter(child => child.done).length;
-                const locked = !priorTasksComplete(steps, index);
+                const locked = !metadataReady || !priorTasksComplete(steps, index);
                 return `
                 <li>
                   <button type="button" class="parent-task${selected?.key === task.key ? ' active' : ''}" data-parent-key="${escapeAttr(task.key)}"${locked ? ' disabled aria-disabled="true"' : ''}>
@@ -1273,7 +1454,7 @@ function renderNestedPhaseTasks(phase) {
                     </span>
                     <span class="parent-copy">
                       <span class="parent-title">${escapeHTML(task.t)}</span>
-                      <span class="parent-progress">${locked ? 'Complete previous tasks to unlock' : `${done} of ${children.length} tasks`}</span>
+                      <span class="parent-progress">${locked ? (!metadataReady ? 'Complete Intake metadata to unlock' : 'Complete previous tasks to unlock') : `${done} of ${children.length} tasks${taskMetadataComplete(task) ? '' : ' · metadata required'}`}</span>
                     </span>
                     ${locked
                       ? '<span class="parent-lock" aria-hidden="true"><svg viewBox="0 0 16 16"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg></span>'
@@ -1332,6 +1513,7 @@ function renderNestedPhaseTasks(phase) {
                   }).join('');
                 })()}
               </ul>
+              ${renderScenarioMetadata(selected)}
             </div>`
             : `<div class="parent-empty"><strong>Select a Scenario</strong><span>Subtasks will appear here.</span></div>`}
         </div>
@@ -1343,6 +1525,28 @@ function renderPhaseTasks(phase) {
   return (phase.steps || []).some(isParentTask)
     ? renderNestedPhaseTasks(phase)
     : renderFlatPhaseTasks(phase);
+}
+
+function copyTaskProgress(source, target) {
+  if (!source || !target) return target;
+  if ('done' in source) target.done = source.done;
+  if ('note' in source && source.kind !== 'section') target.note = source.note;
+  if (source.metadata) target.metadata = { ...source.metadata };
+  const sourceChildren = new Map((source.children || []).map(child => [child.key, child]));
+  (target.children || []).forEach(child => copyTaskProgress(sourceChildren.get(child.key), child));
+  return target;
+}
+
+function rebuildSessionChecklist(session) {
+  const metadata = session.metadata || {};
+  const count = Math.max(1, Math.min(6, Number(metadata.room_count) || 1));
+  metadata.room_count = String(count);
+  metadata.room_names = Array.from({ length: count }, (_, index) => metadata.room_names?.[index] || '');
+  const oldPhase = session.phases.find(phase => phase.key === 'session');
+  const freshPhase = buildPhaseSteps(count, metadata.room_names).find(phase => phase.key === 'session');
+  const oldTasks = new Map((oldPhase?.steps || []).map(task => [task.key, task]));
+  freshPhase.steps.forEach(task => copyTaskProgress(oldTasks.get(task.key), task));
+  session.phases = session.phases.map(phase => phase.key === 'session' ? freshPhase : phase);
 }
 
 function renderMainContent() {
@@ -1380,6 +1584,7 @@ function renderMainContent() {
           ${escapeHTML(p.title)}
         </button>`).join('')}
     </div>
+    ${phase.key === 'session' ? renderSessionMetadata(session) : ''}
     ${renderPhaseTasks(phase)}
   `;
 
@@ -1398,6 +1603,54 @@ function renderMainContent() {
 
   content.innerHTML = html;
 
+  content.querySelectorAll('.session-metadata-input').forEach(input => {
+    input.addEventListener('change', () => {
+      session.metadata ||= {};
+      session.metadata[input.dataset.metaKey] = input.value;
+      if (input.dataset.metaKey === 'room_count') rebuildSessionChecklist(session);
+      logSessionEvent(session.session_id, 'metadata_updated', { field: input.dataset.metaKey, value: input.value });
+      saveState();
+      renderMainContent();
+      renderSidebar();
+    });
+    input.addEventListener('input', () => {
+      session.metadata ||= {};
+      session.metadata[input.dataset.metaKey] = input.value;
+      saveState();
+    });
+  });
+  content.querySelectorAll('.room-name-input').forEach(input => {
+    input.addEventListener('change', () => {
+      session.metadata.room_names[Number(input.dataset.roomIndex)] = input.value;
+      rebuildSessionChecklist(session);
+      logSessionEvent(session.session_id, 'metadata_updated', { field: `room_${Number(input.dataset.roomIndex) + 1}_name`, value: input.value });
+      saveState();
+      renderMainContent();
+    });
+    input.addEventListener('input', () => {
+      session.metadata.room_names[Number(input.dataset.roomIndex)] = input.value;
+      saveState();
+    });
+  });
+  content.querySelectorAll('.scenario-metadata-input').forEach(input => {
+    const saveScenarioMetadata = rerender => {
+      const currentPhase = session.phases.find(item => item.key === 'session');
+      const parent = currentPhase?.steps.find(task => task.key === input.dataset.parentKey);
+      if (!parent) return;
+      parent.metadata ||= {};
+      parent.metadata[input.dataset.fieldKey] = input.value;
+      saveState();
+      if (rerender) {
+        logSessionEvent(session.session_id, 'metadata_updated', {
+          parent_key: parent.key, field: input.dataset.fieldKey, value: input.value,
+        });
+        renderMainContent();
+        renderSidebar();
+      }
+    };
+    input.addEventListener('input', () => saveScenarioMetadata(false));
+    input.addEventListener('change', () => saveScenarioMetadata(true));
+  });
   content.querySelectorAll('.seg-btn').forEach(btn => btn.addEventListener('click', () => {
     state.currentPhaseKey = btn.dataset.phase;
     state.currentParentKey = null;
@@ -1471,7 +1724,7 @@ function toggleChildTask(phaseKey, parentKey, childIdx) {
   const parentIndex = phase?.steps.findIndex(task => isParentTask(task) && task.key === parentKey) ?? -1;
   const parent = parentIndex >= 0 ? phase.steps[parentIndex] : null;
   const child = parent?.children?.[childIdx];
-  if (!parent || !priorTasksComplete(phase.steps, parentIndex) || !isCheckableStep(child)) return;
+  if (!parent || !sessionMetadataComplete(session) || !priorTasksComplete(phase.steps, parentIndex) || !isCheckableStep(child)) return;
 
   child.done = !child.done;
   logSessionEvent(session.session_id, child.done ? 'step_completed' : 'step_reopened', {
@@ -1492,12 +1745,22 @@ async function completeSession(session) {
   session.notes = notesInput ? notesInput.value : session.notes;
   if (!String(session.notes || '').trim()) return;
   session.status = 'completed';
+  const scenarioMetadata = Object.fromEntries(
+    (session.phases.find(phase => phase.key === 'session')?.steps || [])
+      .filter(isParentTask)
+      .map(task => [task.key, { title: task.t, ...task.metadata }])
+  );
 
   await writeRow(SESSIONS_WRITE_URL, {
     session_id: session.session_id, status: 'completed',
     notes: session.notes,
+    metadata: session.metadata,
+    scenario_metadata: scenarioMetadata,
   });
-  logSessionEvent(session.session_id, 'session_completed');
+  logSessionEvent(session.session_id, 'session_completed', {
+    metadata: session.metadata,
+    scenario_metadata: scenarioMetadata,
+  });
 
   saveState();
   renderMainContent();

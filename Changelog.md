@@ -4,6 +4,33 @@ All notable changes to Project Sesame are documented here. The version scheme is
 
 ---
 
+## Docs — 2026-09-14 (single-file layout)
+
+**Status**: `demo.html` removed; no `APP_VERSION` bump
+
+### Minor changes
+- Removed `demo.html`. `index.html` is the only app file: edit it locally and GitHub Pages serves it.
+
+---
+
+## 0.3.091426
+
+**Status**: Hydra runbook workflow and metadata capture
+
+### Major changes
+- Rebuilt the checklist from `Hydra-mmWave-Centific-Collection-Runbook-8_27.pdf`.
+- Added C0 IMU calibration-support motion once per session.
+- Consolidated T1/A1/A2/M1 into T1 natural tracking, generated once for each of 1–6 Intake-selected rooms.
+- Added required Intake metadata: Feather Task ID, people count, age range(s), room count, and room names.
+- Added required C0 and per-room T1 capture metadata. A scenario only completes after its checklist and final accepted values are complete.
+- Reworked Device Prep, room planning/capture/review, Ingestion, validation, package verification, SHA-256 capture, and upload order to match the runbook.
+
+### Data-model changes
+- Session completion now writes both `metadata` and `scenario_metadata`; field changes emit `metadata_updated` SessionLog events when flows are wired.
+- Session storage moved to `sesame_session_v30_` so stale demo data using the removed scenario structure cannot load.
+
+---
+
 ## 0.2.091426
 
 **Status**: On-screen brand matches Project Sesame
