@@ -1,6 +1,26 @@
-# Changelog — Project Wave
+# Changelog — Project Sesame
 
-All notable changes to Project Wave are documented here. The version scheme is `MAJOR.MINOR.MMDDYY` (date is always MMDDYY of the build).
+All notable changes to Project Sesame are documented here. The version scheme is `MAJOR.MINOR.MMDDYY` (date is always MMDDYY of the build).
+
+---
+
+## 0.2.091426
+
+**Status**: On-screen brand matches Project Sesame
+
+### Minor changes
+- Login, nav, page title, menu version stamp, reminder placeholder, and console prefixes say **Sesame** (no longer **mmWave** / **Wave**).
+- Docs already use Project Sesame. Remaining Wave names are historical: local folder, demo repo `Wave-Checklist-Beta`, localStorage keys, and the `wave.admin` login.
+
+---
+
+## Docs — 2026-09-14
+
+**Status**: Project rename and production repo (superseded by `0.2.091426` for UI copy)
+
+### Minor changes
+- Product name in docs is **Project Sesame**. Production GitHub repo is `Sesame-Tracker`; live site is https://RR-Centific.github.io/Sesame-Tracker/.
+- Earlier name **Project Wave** remains as history: local folder name, demo repo `Wave-Checklist-Beta`, and localStorage keys (`wave_session_v26_`, etc.).
 
 ---
 

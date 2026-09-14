@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f0f0e">
-<title>Wave — Moderator Checklist</title>
+<title>Sesame — Moderator Checklist</title>
 <style>
 /* ============================================================
    TOKENS — Centific Kilo Design System (see Reference Files/
@@ -490,7 +490,7 @@ nav{
 <!-- ============================================================ LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-card">
-    <div class="login-brand"><div class="login-dot"></div><span>mmWave</span></div>
+    <div class="login-brand"><div class="login-dot"></div><span>Sesame</span></div>
     <div class="login-title">Sign in</div>
     <div class="login-sub">Enter your username to open the moderator app or admin dashboard.</div>
     <input type="text" id="loginUsername" placeholder="Username" autocomplete="username" autocapitalize="none">
@@ -510,7 +510,7 @@ nav{
     <div class="nav-row">
       <div class="nav-left">
         <div class="nav-dot"></div>
-        <span class="nav-brand">mmWave</span>
+        <span class="nav-brand">Sesame</span>
       </div>
       <div class="nav-right">
         <div class="nav-user">
@@ -577,7 +577,7 @@ nav{
 
   <div class="divider"></div>
   <div class="section-label">Key reminders</div>
-  <div class="todo-note">Placeholder content — replace with Wave's real reminders.</div>
+  <div class="todo-note">Placeholder content — replace with Sesame's real reminders.</div>
   <div class="reminder-item"><span class="reminder-icon">⚠️</span><span class="reminder-text">Never leave equipment unattended at a site.</span></div>
   <div class="reminder-item"><span class="reminder-icon">⚠️</span><span class="reminder-text">Confirm participant ID before starting any recording.</span></div>
   <div class="reminder-item"><span class="reminder-icon">⚠️</span><span class="reminder-text">Do not clear a memory card until footage is confirmed uploaded.</span></div>
@@ -609,7 +609,7 @@ nav{
    placeholder data so the UI is fully testable before any flow exists.
    ============================================================ */
 
-const APP_VERSION = '0.2.082426'; // MAJOR.MINOR.MMDDYY — bump date on every change
+const APP_VERSION = '0.2.091426'; // MAJOR.MINOR.MMDDYY — bump date on every change
 
 // === Power Automate flow URLs (SharePoint Lists) — dormant until wired ===
 const MODERATORS_READ_URL   = ''; // Get items — Moderators list, filter by username
@@ -862,7 +862,7 @@ function sessionKeyFor(username) { return `wave_session_v26_${username.toLowerCa
 function saveState() {
   if (!state.username) return;
   try { localStorage.setItem(sessionKeyFor(state.username), JSON.stringify(state)); }
-  catch (e) { console.warn('[Wave] saveState failed:', e); }
+  catch (e) { console.warn('[Sesame] saveState failed:', e); }
 }
 
 function loadState(username) {
@@ -888,18 +888,18 @@ async function readRows(url) {
   if (!url) return null; // null = "not wired", distinct from [] = "wired but empty"
   try {
     const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), cache: 'no-store' });
-    if (!res.ok) { console.warn(`[Wave] read failed: HTTP ${res.status}`); return null; }
+    if (!res.ok) { console.warn(`[Sesame] read failed: HTTP ${res.status}`); return null; }
     const data = await res.json();
     return extractArray(data);
-  } catch (e) { console.warn('[Wave] read threw:', e.message); return null; }
+  } catch (e) { console.warn('[Sesame] read threw:', e.message); return null; }
 }
 
 async function writeRow(url, row) {
-  if (!url) { console.log('[Wave] write skipped (flow not wired):', row); return false; }
+  if (!url) { console.log('[Sesame] write skipped (flow not wired):', row); return false; }
   try {
     const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(row) });
     return res.ok;
-  } catch (e) { console.warn('[Wave] write threw:', e.message); return false; }
+  } catch (e) { console.warn('[Sesame] write threw:', e.message); return false; }
 }
 
 function logSessionEvent(sessionId, event, extra) {
@@ -996,7 +996,7 @@ function showApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   document.documentElement.setAttribute('data-theme', state.theme || 'dark');
-  document.getElementById('versionLabel').textContent = `mmWave v${APP_VERSION}`;
+  document.getElementById('versionLabel').textContent = `Sesame v${APP_VERSION}`;
   const navUser = document.getElementById('navUsername');
   navUser.textContent = state.username || '';
   navUser.title = state.username || '';

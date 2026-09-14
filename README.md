@@ -1,8 +1,8 @@
-# Project Wave — Moderator Checklist & Admin Tracking App
+# Project Sesame — Moderator Checklist & Admin Tracking App
 
 ## What is this project?
 
-Project Wave (on-screen brand for now: **mmWave**) is a data-collection moderator app plus an admin dashboard for tracking video collection toward a 100-hour target. Moderators use a Kilo-style checklist to work through assigned sessions. Admins see progress toward that target (demo metrics until SharePoint is wired).
+**Project Sesame** (production app: **Sesame Tracker**) is a data-collection moderator app plus an admin dashboard for tracking video collection toward a 100-hour target. Moderators use a Kilo-style checklist to work through assigned sessions. Admins see progress toward that target (demo metrics until SharePoint is wired). On-screen brand in the app is **Sesame**.
 
 The working copy is a single-file HTML app. Until the demo is finalized, **`demo.html` and `index.html` stay mirrored** (`index.html` is what GitHub Pages serves). After that, work only on `index.html`. SharePoint Lists and Power Automate are the intended backend; they are not wired yet, so the UI runs on local placeholder data.
 
@@ -57,12 +57,12 @@ The working copy is a single-file HTML app. Until the demo is finalized, **`demo
 
 ## How it fits into the bigger picture
 
-**Upstream**: A scheduling system (separate from Wave) assigns moderators to sites and sessions. Wave reads the assigned sessions at login.
+**Upstream**: A scheduling system (separate from Sesame) assigns moderators to sites and sessions. Sesame reads the assigned sessions at login.
 
-**Wave's role**: Ensures the data-collection protocol is followed. Will provide reference clips/GIFs. Logs step completion for audit (SessionLog) once the backend is live.
+**Sesame's role**: Ensures the data-collection protocol is followed. Will provide reference clips/GIFs. Logs step completion for audit (SessionLog) once the backend is live.
 
 **Downstream**:
-- **QA process** (separate): The data team reviews recorded video against the SessionLog. If video doesn't match checklist, it's flagged. Wave's audit trail makes QA much easier.
+- **QA process** (separate): The data team reviews recorded video against the SessionLog. If video doesn't match checklist, it's flagged. Sesame's audit trail makes QA much easier.
 - **Analytics**: Project leadership uses admin dashboards to track progress toward 100-hour target, identify bottlenecks, and make staffing decisions.
 - **Reporting**: HR/scheduling can see which moderators were productive, which sites had issues, etc.
 
@@ -99,7 +99,7 @@ If you're reopening this project in a new Claude chat:
 
 ## Version and status
 
-**Current version**: `0.2.082426` — details in `Changelog.md`  
+**Current version**: `0.2.091426` — details in `Changelog.md`  
 **Status**: Client-demo moderator UI with placeholder data; backend not wired. Live demo: https://RR-Centific.github.io/Sesame-Tracker/  
 Details in `Dev_Notes.md`.
 

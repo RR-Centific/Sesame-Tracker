@@ -1,4 +1,4 @@
-# Team_Handoff — Project Wave Maintenance Guide
+# Team_Handoff — Project Sesame Maintenance Guide
 
 **This document is written for humans**, not AI. If you're using Claude to make changes to this project, point Claude at `Dev_Notes.md` first — it has the full technical context. Then return here to understand the operational side.
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-You're inheriting the Wave / **mmWave** moderator checklist (see `README.md` for what the product is). Display name in the app is **mmWave** for now.
+You're inheriting the **Project Sesame** moderator checklist (see `README.md` for what the product is). Production GitHub repo is `Sesame-Tracker`. On-screen brand in the app is **Sesame**.
 
 **Architecture**:
 - **Frontend**: Single-file Kilo-style UI. Until the demo is locked, keep **`demo.html` and `index.html` identical** (`index.html` is the GitHub Pages file). After that, work only on `index.html`.
@@ -23,7 +23,7 @@ You're inheriting the Wave / **mmWave** moderator checklist (see `README.md` for
 ### How to make a change
 
 #### If you're not technical
-1. Open a new Claude chat and paste this entire Project Wave folder as a project context
+1. Open a new Claude chat and paste this entire Project Sesame folder as a project context
 2. Describe what you want to change (e.g., "Add a new checkbox to the checklist," "Change the accent color to #00F0FF")
 3. Claude will propose changes and explain them
 4. When Claude is done, ask Claude to show you the changes before deploying
@@ -170,7 +170,7 @@ Every code change should bump the version (at minimum the date segment). Moderat
 UI optimized for phones (sidebar → overlay on narrow screens). Always test on real iPhone + Android before deploying. Desktop works too, but not the priority.
 
 ### Dark mode + pink accent
-Kilo design system: dark background (#0f0f0e), pink accent (#EF43B3), "SF Pro Display" font stack. On-screen title is **mmWave** (nav + login). Light mode toggle exists in the nav.
+Kilo design system: dark background (#0f0f0e), pink accent (#EF43B3), "SF Pro Display" font stack. On-screen title is **Sesame** (nav + login). Light mode toggle exists in the nav.
 
 ### No third-party dependencies
 Vanilla HTML, CSS, JavaScript only. No frameworks, no npm. Easy to deploy, no dependency rot.

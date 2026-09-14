@@ -1,8 +1,8 @@
-# Dev_Notes — Project Wave Working Context
+# Dev_Notes — Project Sesame Working Context
 
 This document is written for a Claude chat picking this project back up. See `README.md` for the big picture.
 
-**Architecture note**: Project Wave has:
+**Architecture note**: Project Sesame has:
 - **Frontend**: Kilo-style checklist UI (sidebar + main panel, mobile-first, Kilo design system)
 - **Backend**: SharePoint Lists + Power Automate flows (not local-only, not Excel)
 - **Scope**: Moderator app + optional admin dashboards. No mid-session approval workflow.
@@ -13,7 +13,7 @@ This document is written for a Claude chat picking this project back up. See `RE
 ## File & folder inventory
 
 ```
-Project Wave Checklist App Test/
+Project Sesame (local folder may still be named Project Wave Checklist App Test)/
 ├── README.md                          [Front door — orientation, where to go]
 ├── Dev_Notes.md                       [This file — working context]
 ├── Changelog.md                       [Version history and why]
@@ -39,18 +39,18 @@ Project Wave Checklist App Test/
 
 ### What each reference file is for
 
-- **Kilo Task Tracker.html** — UI reference. Copy HTML structure, CSS, and Kilo design system. Modify the task/step data structure for Wave's sessions/steps.
+- **Kilo Task Tracker.html** — UI reference. Copy HTML structure, CSS, and Kilo design system. Modify the task/step data structure for Sesame's sessions/steps.
 - **centific-kilo-design-system.md** — Visual tokens: colors (#EF43B3 pink accent, dark mode), spacing, typography. Use exactly.
-- **ARCHITECTURE_REFERENCE.md** — Project Orbit's backend patterns. Wave uses similar concepts (cloud sync, status logging, soft deletes) but with SharePoint Lists instead of Excel. Reference sections 7-9 for state management, Power Automate + backend patterns, and refresh architecture.
-- **PROJECT_INSTRUCTIONS.md** — Original brief. Updated to clarify Wave has backend (SharePoint Lists + Power Automate), unlike local-only Kilo.
-- **App_Build_Workflow_and_Replication_Guide.md** — General Centific playbook for these single-file apps: tech stack, deploy, Claude workflow, pre-ship QA, replication steps. **Known divergence**: its section 4-5 (the database and connectors) is written entirely around Excel tables on SharePoint (Excel Online actions, all-Text columns, 256-row pagination cap). Wave intentionally uses SharePoint Lists instead — see "SharePoint Lists + Power Automate backend" under Key decisions below for why. When following this guide's replication steps for Wave, substitute: "Get items" (SharePoint) for "List rows" (Excel), List column filters for Excel column filters, and native SharePoint column types where the guide says Text-only. Everything else in the guide (single-file HTML, version stamping, pre-ship QA checklist, dormant-until-wired URLs, deployment) applies to Wave as written.
+- **ARCHITECTURE_REFERENCE.md** — Project Orbit's backend patterns. Sesame uses similar concepts (cloud sync, status logging, soft deletes) but with SharePoint Lists instead of Excel. Reference sections 7-9 for state management, Power Automate + backend patterns, and refresh architecture.
+- **PROJECT_INSTRUCTIONS.md** — Original brief. Updated to clarify Sesame has backend (SharePoint Lists + Power Automate), unlike local-only Kilo.
+- **App_Build_Workflow_and_Replication_Guide.md** — General Centific playbook for these single-file apps: tech stack, deploy, Claude workflow, pre-ship QA, replication steps. **Known divergence**: its section 4-5 (the database and connectors) is written entirely around Excel tables on SharePoint (Excel Online actions, all-Text columns, 256-row pagination cap). Sesame intentionally uses SharePoint Lists instead — see "SharePoint Lists + Power Automate backend" under Key decisions below for why. When following this guide's replication steps for Sesame, substitute: "Get items" (SharePoint) for "List rows" (Excel), List column filters for Excel column filters, and native SharePoint column types where the guide says Text-only. Everything else in the guide (single-file HTML, version stamping, pre-ship QA checklist, dormant-until-wired URLs, deployment) applies to Sesame as written.
 
 ---
 
 ## Current state
 
 ### Version
-**0.2.082426** (`APP_VERSION` in `demo.html` / `index.html`). See `Changelog.md`.
+**0.2.091426** (`APP_VERSION` in `demo.html` / `index.html`). See `Changelog.md`.
 
 ### Shipped (local-only skeleton)
 - [x] Frontend skeleton in `demo.html` / `index.html` (Kilo tokens, login, app shell, menu, theme toggle, mobile layout)
@@ -128,7 +128,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
 - [x] Build menu panel (reminders, troubleshooting table, settings)
 - [x] Add session completion form (notes required; Complete session gated on all steps + notes)
 - [ ] Test on iPhone + Android
-- [x] Version bump to 0.2.MMDDYY (`0.2.082426`)
+- [x] Version bump to 0.2.MMDDYY (`0.2.091426`; previous demo polish was `0.2.082426`)
 
 **Admin dashboard (basic):**
 - [x] Create admin login view (`admin` / `wave.admin`, `role: admin`)
@@ -166,7 +166,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
 2. **Reference media** (for embedded clips/GIFs):
    - What reference clips/GIFs will moderators need? (e.g., "Here's correct camera placement", "Here's what acceptable video quality looks like")
    - Where will these be stored? (SharePoint Document Library, OneDrive, shared drive?)
-   - Who will upload/maintain them? (video team, PM, or Wave admin?)
+   - Who will upload/maintain them? (video team, PM, or Sesame admin?)
    - Will media be per-step or per-session-type?
 
 3. **Key reminders & troubleshooting**:
@@ -179,7 +179,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Ce
 
 5. **Moderator workflow clarification**:
    - Should Sessions be pre-populated in the app, or created by moderator at start of day?
-   - Will Wave integrate with a scheduling system, or is scheduling out-of-band?
+   - Will Sesame integrate with a scheduling system, or is scheduling out-of-band?
 
 ---
 
@@ -298,10 +298,10 @@ Flat phases (Device Prep and Post-Session) still use their existing simple step 
 
 ---
 
-### On-screen name is mmWave (for now)
-**Decision**: Nav, login brand, and the menu version stamp say `mmWave` (e.g. `mmWave v0.2.082426`). Folder and docs still say Project Wave. The stamp is demo-only and will switch to the locked project name later.
+### Project name is Project Sesame
+**Decision**: The product is **Project Sesame**. Production GitHub repo and Pages site are `Sesame-Tracker`. Nav, login brand, page title, and the menu version stamp say **Sesame** (e.g. `Sesame v0.2.091426`). The local workspace folder and the Aug 2026 demo repo (`Wave-Checklist-Beta`) still use the old Wave name. localStorage keys (`wave_session_v26_`, etc.) and the legacy demo login `wave.admin` are unchanged so existing demo state still loads.
 
-**Why**: Riley asked for this display name during skeleton work. Treat as temporary until a final product name is locked.
+**Why**: Name locked 14 Sep 2026. `mmWave` / Project Wave were temporary names during skeleton and client-demo work.
 
 ---
 
