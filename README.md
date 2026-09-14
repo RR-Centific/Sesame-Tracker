@@ -100,7 +100,7 @@ If you're reopening this project in a new Claude chat:
 ## Version and status
 
 **Current version**: `0.2.082426` — details in `Changelog.md`  
-**Status**: Client-demo moderator UI with placeholder data; backend not wired. Live demo: https://RileyRobertson-Centific.github.io/Wave-Checklist-Beta/  
+**Status**: Client-demo moderator UI with placeholder data; backend not wired. Live demo: https://RR-Centific.github.io/Sesame-Tracker/  
 Details in `Dev_Notes.md`.
 
 For deployment instructions, see `Team_Handoff.md` → "Maintaining the application."

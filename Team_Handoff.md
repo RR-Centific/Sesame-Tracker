@@ -49,9 +49,9 @@ You're inheriting the Wave / **mmWave** moderator checklist (see `README.md` for
 
 1. Verify the app works locally (open `demo.html` or `index.html` in a browser, test on iOS and Android if possible)
 2. Make sure `index.html` matches `demo.html` (copy `demo.html` over `index.html` if you edited the working copy)
-3. Commit both files to the `main` branch of `https://github.com/RileyRobertson-Centific/Wave-Checklist-Beta.git`
+3. Commit both files to the `main` branch of `https://github.com/RR-Centific/Sesame-Tracker.git`
 4. GitHub Pages deploys from `main` / `/` (already enabled)
-5. Test the live version at `https://RileyRobertson-Centific.github.io/Wave-Checklist-Beta/`
+5. Test the live version at `https://RR-Centific.github.io/Sesame-Tracker/`
 
 #### Recurring maintenance tasks
 
@@ -213,7 +213,7 @@ Before declaring any change done:
   - [ ] SessionLog write
   - [ ] Sessions update (status/useable_minutes)
   - [ ] Moderators read
-- [x] **Set up GitHub repo** for version control (`https://github.com/RileyRobertson-Centific/Wave-Checklist-Beta.git`)
+- [x] **Set up GitHub repo** for version control (`https://github.com/RR-Centific/Sesame-Tracker.git`; beta archive: `https://github.com/RR-Centific/Wave-Checklist-Beta.git`)
 - [x] **Build `app.html` skeleton**:
   - [x] Copy from Kilo Task Tracker.html (structure/tokens)
   - [x] Add login screen
@@ -234,7 +234,7 @@ Before declaring any change done:
 - [ ] **Full end-to-end testing**: Login → see sessions → complete → verify admin dashboard
 - [ ] **Fix bugs from testing**
 - [ ] **Brief moderator team**: How to use app, what each step means, how to handle errors
-- [x] **Deploy to GitHub Pages** (`https://RileyRobertson-Centific.github.io/Wave-Checklist-Beta/`)
+- [x] **Deploy to GitHub Pages** (`https://RR-Centific.github.io/Sesame-Tracker/`)
 - [ ] **Verify data is flowing correctly**: Check SharePoint Lists, SessionLog populated, admin dashboard updating
 
 ### Before using in production

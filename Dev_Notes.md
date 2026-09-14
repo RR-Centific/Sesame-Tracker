@@ -79,7 +79,7 @@ Project Wave Checklist App Test/
 - Drop `demo.html` and work only on `index.html` after the demo is locked
 
 ### How to run locally
-Open `demo.html` or `index.html` in a browser, or the live demo at https://RileyRobertson-Centific.github.io/Wave-Checklist-Beta/. Amber banner: `moderator` (checklist) and `admin` (dashboard). If the list looks stale, sign out or use a private window — storage key is currently `wave_session_v26_`. Until the demo is finalized, edit `demo.html` and copy it to `index.html` so they stay identical.
+Open `demo.html` or `index.html` in a browser, or the live demo at https://RR-Centific.github.io/Sesame-Tracker/. Amber banner: `moderator` (checklist) and `admin` (dashboard). If the list looks stale, sign out or use a private window — storage key is currently `wave_session_v26_`. Until the demo is finalized, edit `demo.html` and copy it to `index.html` so they stay identical.
 
 ---
 
@@ -142,7 +142,7 @@ Open `demo.html` or `index.html` in a browser, or the live demo at https://Riley
 - [ ] Fix bugs from testing
 - [ ] Populate all reference media
 - [ ] Brief moderator team on workflow
-- [x] Deploy to GitHub Pages (`https://RileyRobertson-Centific.github.io/Wave-Checklist-Beta/`; source branch `main`)
+- [x] Deploy to GitHub Pages (`https://RR-Centific.github.io/Sesame-Tracker/`; source branch `main`)
 - [ ] Version bump to 1.0.MMDDYY
 
 ### Post-release (if time/scope allows)
